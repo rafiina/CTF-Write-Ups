@@ -4,7 +4,7 @@
 
 The web page for Blitz Prop is a beautiful, futuristic looking feedback form. As the user, we are provided with a list of songs from a famous alien band called Blitz Prop and asked to choose our favorite.
 
-![BlitzProp](./images/BlitzProp.png)
+![BlitzProp](images/BlitzProp.png)
 
 There are some hints here in the songs names for those with the right insight, but we'll ignore those. Instead, the source code is available, so let's treat this like something of a code review:
 
@@ -43,7 +43,7 @@ router.post("/api/submit", (req, res) => {
 
 A cursory look shows that our input is 'unflattened' using the 'flat' library then checked for one of the song names as a substring. If a song is found, pug is used to process a template and return some text to display on the webpage. A quick look at the form payload reveals flattened JSON that we can fiddle with using Burp, developer tools, curl, or whatever your favorite tool is for sending HTML requests.
 
-![BlitzProp-Request](./images/bp-request.png)
+![BlitzProp-Request](images/bp-request.png)
 
 ## Identifying the vulnerability
 
@@ -171,7 +171,7 @@ find: /proc/26/ns: Permission denied
 
 Let's visit /static/possible_flags.txt:
 
-![BlitzProp_Find_Error](./images/bp-find-error.png)
+![BlitzProp_Find_Error](images/bp-find-error.png)
 
 The flag name is protected using [Security through Obscurity](https://en.wikipedia.org/wiki/Security_through_obscurity), but not very well. Let's go ahead and snag it:
 
@@ -187,6 +187,6 @@ The flag name is protected using [Security through Obscurity](https://en.wikiped
 
 Submit the same way and check it out in the browser:
 
-![BlitzProp_Flag](./images/bp-flag.png)
+![BlitzProp_Flag](images/bp-flag.png)
 
 Success!
