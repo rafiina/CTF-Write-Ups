@@ -49,7 +49,7 @@ A cursory look shows that our input is 'unflattened' using the 'flat' library th
 
 The application is very simple. Node.js and Express are commonly used, robust tools for serving javascript based web applications. However, both `pug` and `flat` are interesting.
 
-[Pug.js](https://pugjs.org/api/getting-started.html) is a templating tool. In this app, it is used for one thing: [String Interpolation](https://en.wikipedia.org/wiki/String_interpolation#JavaScript). Since string interpolation is built-in to javascript, we have reason to be suspicious here. However, the string being subsituted is hardcoded, so this could be a red-herring, so let's set it aside for now and look at flat.
+[Pug.js](https://pugjs.org/api/getting-started.html) is a templating tool. In this app, it is used for one thing: [String Interpolation](https://en.wikipedia.org/wiki/String_interpolation#JavaScript). Since string interpolation is built-in to javascript, we have reason to be suspicious here. However, the string being subsituted is hardcoded. This could be a red-herring, so let's set it aside for now and look at flat.
 
 [Flat](https://github.com/hughsk/flat) is a tool for flattening and unflattening JSON objects. In our case, it will transform the JSON payload from our above image to:
 
@@ -90,17 +90,17 @@ Bingo! We were able to pollute the Object space so that all objects have a prope
 
 ## Find the Weakness
 
-How do we exploit this? There are no if brances to bypass in the code. The default Object space only has functions to overwrite, but since we can only submit valid JSON, we cannot define our own function.
+How do we exploit this? There are no if branches to bypass in the code. The default Object space only has functions to overwrite, but since we can only submit valid JSON, we cannot define our own function.
 
-**Note:** This is because functions definitions are not valid JSON and so will fail. You can overwrite a function with a payload such as `{ 'Object.__proto__.toString': '() => return "RIP ⚰"' }` but it will break everything as a critical _function_ has now been redefined as a _string_.
+**Note:** This is because function definitions are not valid JSON and so will fail. You can overwrite a function with a payload such as `{ 'Object.__proto__.toString': '() => return "RIP ⚰️"' }` but it will break everything, as a critical _function_ has now been redefined as a _string_.
 
-We could achieve RCE if we could find an `exec()` or `eval()` statement _anywhere in our application_. Maybe Pug?..
+We can achieve RCE if we can find an `exec()` or `eval()` statement _anywhere in our application_. Maybe Pug?..
 
-A little bit of googling with the terms `pug prototype pollution` hands us another excellent article called [AST Injection, Prototype Pollution to RCE](https://blog.p6.is/AST-Injection/), this one by Beomjin Lee. In this article, we find essentially an identical setup using `pug` and `flat`.
+A little bit of googling with the terms `pug prototype pollution` hands us another excellent article called [AST Injection, Prototype Pollution to RCE](https://blog.p6.is/AST-Injection/), this one by Beomjin Lee. In this article, we find an essentially identical setup using `pug` and `flat`, along with a deep-dive into how pug is vulnerable to [AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree) Injection through prototype pollution.
 
 ### Exploit
 
-The linked blog is kind enough to provide a payload and goes into some detail on how it works. The underlying principle is Prototype Pollution, as discussed, but its worth reviewing the Pug source code to understand why it happens. However, that is outside the scope of this write-up, so we will proceed with our exploit.
+The linked blog is kind enough to provide a payload and goes into some detail on how it works. The underlying principle is still Prototype Pollution, but its worth reviewing the Pug source code to understand why it happens. However, that is outside the scope of this write-up, so we will proceed with our exploit.
 
 If you have a system with a public IP that you can use to get a reverse shell, you're golden, but I will offer an alternative. The base app makes all items in the path `/static` publicly available:
 
@@ -112,7 +112,7 @@ const path = require("path");
 
 app.use(express.json());
 app.set("views", "./views");
-app.use("/static", express.static(path.resolve("static")));
+app.use("/static", express.static(path.resolve("static"))); // <----- Here
 
 app.use(routes);
 
@@ -124,7 +124,7 @@ app.listen(1337, () => console.log("Listening on port 1337"));
 ```
 
 So, let's just move our flag file there and view in our browser 😁
-Since we don't know the flag file name, we'll see two payloads. I will use firefox dev tools to submit the payload because I'm lazy 😎
+Since we don't know the flag file name, we'll send two payloads. I will use Firefox dev tools to submit the payload because I'm lazy 😎
 
 ```json
 {
@@ -136,7 +136,7 @@ Since we don't know the flag file name, we'll see two payloads. I will use firef
 }
 ```
 
-We are presented with a server error, but it just shows our code executed!
+We are presented with a server error, but the ouput is just `find` errors. Our code executed succesfully!
 
 ```log
 Error: Command failed: find / -type f -name '*flag*' > static/possible_flags.txt
