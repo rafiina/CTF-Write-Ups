@@ -189,4 +189,4 @@ Submit the same way and check it out in the browser:
 
 ![BlitzProp_Flag](images/bp-flag.png)
 
-Success!
+Success! The flag is `CHTB{p0llute_with_sty13}`
