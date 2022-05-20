@@ -163,8 +163,18 @@ Run our program with the payload against the challenge docker:
 
 `nc 159.65.58.144 30131 <payload`
 
-![pip payload into netcat, get flag!](images/flag.png)
+![pipe payload into netcat, get flag!](images/flag.png)
 
 And there you have it!
 
 `HTB{n0_n33d_2_ch4ng3_m3ch5_wh3n_u_h4v3_fl0w_r3d1r3ct}`
+
+## Bonus Payload
+
+It wasn't the intended solution, but we can get the flag by just passing the string comparison.  We do this by passing in the secret string terminated by a nullbyte.
+
+`echo -ne '1BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBDRAEGER15th30n34nd0nly4dm1n15tr4t0R0fth15sp4c3cr4ft\x00' > payload`
+
+![pipe bonus payload into netcat, get flag!](images/authenticated.png)
+
+As a bonus bonus -- no authentication failure or security alarms!
